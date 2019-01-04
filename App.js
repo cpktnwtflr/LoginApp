@@ -7,39 +7,55 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, Keyboard, Alert} from 'react-native';
+import {Platform, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, KeyboardAvoidingView, Keyboard, Alert, CheckBox} from 'react-native';
 
-/*
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-*/
 
 type Props = {};
 export default class App extends Component<Props> {
-  constructor(props) {
+  constructor(props)
+  {
     super(props);
-    this.state = { email:'', password:''};
+    this.state = { email:'', password:'', emailError:'', passwordError:'', emailValue:'', passwordValue:'', errorChecker:'0', btnState:true,};
+    this.handleChangeText=this.handleChangeText.bind(this);
+    this.handleChangeTextPass=this.handleChangeTextPass.bind(this);
   }
-  myFunction=() =>{ const {email, password} = this.state;
-  if(email == ""){
-    this.setState({Error: 'Email address field is empty.'});
+
+  handleChangeText(NewEmailValue)
+  {
+    this.setState({emailValue: NewEmailValue});
+    if(!this.state.emailValue.includes('@') || !this.state.emailValue.includes('.co'))
+      {
+        this.setState({emailError: "Email text isn't email form."});
+        this.setState({btnState:true});
+      }
+    else 
+      {
+        this.setState({emailError: ''});
+        this.setState({btnState:false});
+      }
   }
-  else if(password == ""){
-    this.setState({Error: 'Password field is empty.'});
+
+  handleChangeTextPass(NewPasswordValue)
+  {
+    this.setState({passwordValue: NewPasswordValue});
+    if(this.state.passwordValue.length<5 || this.state.passwordValue.length>11)
+      {
+        this.setState({passwordError: 'Password length must be 6-12 characters'});
+        this.setState({btnState:true});
+      }
+    else
+      {
+        this.setState({passwordError:''});
+        this.setState({btnState:false});
+      }
   }
-  else if(password.length<6 || password.length>12){
-    // else if(password.length<6 && password.length>12){
-    this.setState({Error: 'Password length must be 6-12 characters'});
-  }
-  else{
+
+  myFunction(NewPasswordValue,NewEmailValue){
     alert('Login Successful!');
   }
-  Keyboard.dismiss();
-  }
+
+
+
   render() {
     return (
       <KeyboardAvoidingView behaivior="padding" style={styles.container}>
@@ -60,9 +76,10 @@ export default class App extends Component<Props> {
             autoCorrect={false}
             returnKeyType="next"
             style={styles.input}
-            onChangeText={ email => this.setState({email}) }
+            defaultValue={this.state.emailValue}
+            onChangeText={this.handleChangeText}
           />
-          <Text style={styles.err}>{this.state.Error}</Text>
+          <Text style={styles.err}>{this.state.emailError}</Text>
           <Text style={styles.inputText}>Password</Text>
           <TextInput
             placeholder="Input Password"
@@ -73,17 +90,17 @@ export default class App extends Component<Props> {
             autoCorrect={false}
             style={styles.input}
             ref={(input) => this.passwordInput = input}
-            onChangeText={ password => this.setState({password}) }
+            defaultValue={this.state.passwordValue}
+            onChangeText={this.handleChangeTextPass}
           />
-          <Text style={styles.err}>{this.state.Error}</Text>
-          <TouchableOpacity onPress={this.myFunction} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>Sign In</Text>
+          <Text style={styles.err}>{this.state.passwordError}</Text>
+          <View style={styles.rememberMe}>
+          <CheckBox/><Text style={styles.rememberMeTxt}>Remember me</Text>
+          </View>
+          <TouchableOpacity onPress={this.myFunction} style={styles.buttonContainer} disabled={this.state.btnState}>
+          <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
-        {/* 7:46<View style={styles.formContainer}></View>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>*/}
       </KeyboardAvoidingView>
     );
   }
@@ -91,21 +108,23 @@ export default class App extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
-    padding:5,
     flex: 1,
+    padding:15,
     alignItems: 'center',
     //backgroundColor: 'blue'
   },
   err: {
     color:'red', 
     alignItems:'flex-start',
-    fontSize: 10
+    fontSize: 12
   },
   inputs: {
+    //flex:1,
     padding:10,
     width: '100%',
     position: 'absolute',
     bottom:0,
+    //justifyContent:'flex-end',
     backgroundColor: 'white'
 
   },
@@ -149,18 +168,17 @@ const styles = StyleSheet.create({
     
 
   },
+  rememberMe:{
+    flexDirection: 'row',
+    alignSelf:'flex-start',
+    justifyContent:'center',
+    
 
-/*  
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-*/
+  rememberMeTxt:{
+    //fontSize: 12,
+    alignSelf: 'center'
+  }
+
 
 });
